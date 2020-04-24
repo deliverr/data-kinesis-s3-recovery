@@ -11,24 +11,25 @@ def main(event, context):
         s3_listing = json.loads(record['body'])
         s3_obj = s3.Object(s3_listing['bucket'], s3_listing['item'])
         content = s3_obj.get()['Body'].read().decode('utf-8')
+        # print(f"content length {len(content)}, first 512: {content[:512]}")
 
         decoder = json.JSONDecoder()
-        content_length = len(content)
         decode_index = 0
 
         firehose = boto3.client('firehose')
-        while decode_index < content_length:
+        while decode_index < len(content):
             try:
                 obj, decode_index = decoder.raw_decode(content, decode_index)
-                serialized = base64.b64encode(
-                    json.dumps(obj)
-                        .encode('utf-8'))
+                # print(obj)
+                bytes = json.dumps(obj).encode('utf-8')
                 firehose.put_record(
                     DeliveryStreamName=s3_listing['kinesis_stream'],
                     Record={
-                        'Data': serialized
+                        'Data': bytes
                     }
                 )
+                content = content[decode_index:]
+                decode_index = 0
             except JSONDecodeError as e:
                 # Scan forward and keep trying to decode
                 decode_index += 1
