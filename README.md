@@ -23,7 +23,7 @@ The lambda functions will need an IAM role that has permissions to:
 Files are recovered in two steps, with two lambda functions:
 
   1. `queue_firehose_s3_backups.py` lists all the files in the S3 source records backup and SQS queues each file
-  2. `recover_firehose_s3_backup.main` is triggered by the SQS queue. It parses objects from each file and 
+  2. `recover_firehose_s3_backup.py` is triggered by the SQS queue. It parses objects from each file and 
   puts records to the Kinesis Firehose stream
 
 ## Test
