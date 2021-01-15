@@ -23,7 +23,7 @@ def main(event, context):
                 # print(obj)
                 if 'errorCode' in obj and 'attemptsMade' in obj and 'rawData' in obj:
                     # recovering from ProcessingFailed records
-                    bytes = obj['rawData']
+                    bytes = base64.b64decode(obj['rawData'])
                 else:
                     # recovering from source records
                     bytes = json.dumps(obj).encode('utf-8')
