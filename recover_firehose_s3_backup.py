@@ -21,7 +21,12 @@ def main(event, context):
             try:
                 obj, decode_index = decoder.raw_decode(content, decode_index)
                 # print(obj)
-                bytes = json.dumps(obj).encode('utf-8')
+                if 'errorCode' in obj and 'attemptsMade' in obj and 'rawData' in obj:
+                    # recovering from ProcessingFailed records
+                    bytes = base64.b64decode(obj['rawData'])
+                else:
+                    # recovering from source records
+                    bytes = json.dumps(obj).encode('utf-8')
                 firehose.put_record(
                     DeliveryStreamName=s3_listing['kinesis_stream'],
                     Record={
